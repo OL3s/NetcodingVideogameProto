@@ -4,15 +4,17 @@ namespace BasicGameProject.Backend;
 
 public abstract class Object
 {
+    public int Id;
     public ObjectType Type;
     public Position Position;
     public Size CollisionSize;
 
-    public Object(ObjectType type, Position position, CollisionSize collisionSize)
+    public Object(ObjectType type, Position position, Size collisionSize, int id)
     {
         Type = type;
         Position = position;
         CollisionSize = collisionSize;
+        Id = id;
     }
     public void Teleport(Position position)
     {
@@ -65,5 +67,21 @@ public abstract class Object
                     position.Y + thisHeight > o.Position.Y;
         }
         return false;
+    }
+}
+
+public class Tree : Object
+{
+    public Tree(Position position, int id) : base(ObjectType.Tree, position, id)
+    {
+        this.CollisionSize = new Size(16, 16);
+    }
+}
+
+public class Rock : Object
+{
+    public Rock(Position position, int id) : base(ObjectType.Rock, position, id)
+    {
+        this.CollisionSize = new Size(16, 16);
     }
 }
