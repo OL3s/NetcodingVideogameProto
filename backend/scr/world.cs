@@ -7,7 +7,7 @@ namespace BasicGameProject.Backend;
 public class World
 {
     public List<Player> Players = new List<Player>();
-    public List<Object> Objects = new List<Object>();
+    public List<Backend.Object> Objects = new List<Backend.Object>();
     public Size Size { get; set; }
     public void PrintWorldTiles()
     {
@@ -34,8 +34,8 @@ public static class WorldGenerator
     public Size SizeCompact { get; set; }
     public int TileSize { get; set; }
     public Size RealSize => new Size(SizeCompact.X * TileSize, SizeCompact.Y * TileSize);
-    public List<Object> Objects { get; set; }
-    public List<Player> Players { get; set; }
+    public List<Backend.Object> Objects { get; set; }
+    public List<Backend.Player> Players { get; set; }
     public void SetValues(Size sizeCompact, int tileSize)
     {
         SizeCompact = sizeCompact;
