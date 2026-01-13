@@ -2,7 +2,7 @@ using System.Drawing;
 
 namespace BasicGameProject.Backend;
 
-public class Player : Object, IHumanoid
+public class Player : Backend.Object, IHumanoid
 {
     public int Health { get; set; }
     public int MaxHealth { get; set; }
