@@ -1,17 +1,9 @@
-using System.Drawing;
-
 namespace BasicGameProject.Backend;
 
-public class Player : Backend.Object, IHumanoid
+public class Player : Humanoid
 {
-    public int Health { get; set; }
-    public int MaxHealth { get; set; }
-    public float MaxSpeed { get; set; }
-
-    public Player(Position position) : base(ObjectType.Player, position, new Size(32, 32))
+    public Player(Position position) : base(ObjectType.Player, position, new Size(32, 32), 5.0f, 100, new ArmorValues(1, 1, 1))
     {
-        Health = 100;
-        MaxHealth = 100;
-        MaxSpeed = 5.0f;
+
     }
 }

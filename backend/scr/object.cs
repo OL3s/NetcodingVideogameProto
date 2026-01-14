@@ -1,5 +1,3 @@
-using System.Drawing;
-
 namespace BasicGameProject.Backend;
 
 public abstract class Object
@@ -9,7 +7,7 @@ public abstract class Object
     public Position Position;
     public Size CollisionSize;
 
-    public Object(ObjectType type, Position position, Size collisionSize, int id)
+    public Object(ObjectType type, Position position, Size collisionSize, int id = -1)
     {
         Type = type;
         Position = position;
@@ -20,11 +18,15 @@ public abstract class Object
     {
         Position = position;
     }
-    public bool IsCollision(List<Object> objects, Position position = null)
+    public bool IsCollision(List<Object> objects)
+    {
+        return IsCollision(objects, Position);
+    }
+
+    public bool IsCollision(List<Object> objects, Position position)
     {
         int thisWidth = CollisionSize.Width;
         int thisHeight = CollisionSize.Height;
-        position ??= Position;
 
         foreach (var o in objects)
         {
@@ -33,17 +35,15 @@ public abstract class Object
             int otherWidth = o.CollisionSize.Width;
             int otherHeight = o.CollisionSize.Height;
 
-            return  position.X < o.Position.X + otherWidth &&
-                    position.X + thisWidth > o.Position.X &&
-                    position.Y < o.Position.Y + otherHeight &&
-                    position.Y + thisHeight > o.Position.Y;
+            bool overlap = position.X < o.Position.X + otherWidth &&
+                           position.X + thisWidth > o.Position.X &&
+                           position.Y < o.Position.Y + otherHeight &&
+                           position.Y + thisHeight > o.Position.Y;
+
+            if (overlap)
+                return true;
         }
         return false;
-    }
-
-    public bool IsCollision(List<Object> objects)
-    {
-        return IsCollision(objects, Position);
     }
 
     public bool IsCollision(List<Object> objects, Movement movement)
@@ -61,10 +61,13 @@ public abstract class Object
             int otherWidth = o.CollisionSize.Width;
             int otherHeight = o.CollisionSize.Height;
 
-            return  position.X < o.Position.X + otherWidth &&
-                    position.X + thisWidth > o.Position.X &&
-                    position.Y < o.Position.Y + otherHeight &&
-                    position.Y + thisHeight > o.Position.Y;
+            bool overlap = position.X < o.Position.X + otherWidth &&
+                           position.X + thisWidth > o.Position.X &&
+                           position.Y < o.Position.Y + otherHeight &&
+                           position.Y + thisHeight > o.Position.Y;
+
+            if (overlap)
+                return true;
         }
         return false;
     }
@@ -72,16 +75,14 @@ public abstract class Object
 
 public class Tree : Object
 {
-    public Tree(Position position, int id) : base(ObjectType.Tree, position, id)
+    public Tree(Position position, int id) : base(ObjectType.Resource, position, new Size(16, 16), id)
     {
-        this.CollisionSize = new Size(16, 16);
     }
 }
 
 public class Rock : Object
 {
-    public Rock(Position position, int id) : base(ObjectType.Rock, position, id)
+    public Rock(Position position, int id) : base(ObjectType.Resource, position, new Size(16, 16), id)
     {
-        this.CollisionSize = new Size(16, 16);
     }
 }

@@ -1,0 +1,10 @@
+{
+  "version": 2,
+  "dgSpecHash": "fPNjt9/4FRA=",
+  "success": true,
+  "projectFilePath": "/home/ole-kristian-wigum/Documents/Coding/BasicGameProject/backend/Backend.csproj",
+  "expectedPackageFiles": [
+    "/home/ole-kristian-wigum/.nuget/packages/raylib-cs/7.0.2/raylib-cs.7.0.2.nupkg.sha512"
+  ],
+  "logs": []
+}

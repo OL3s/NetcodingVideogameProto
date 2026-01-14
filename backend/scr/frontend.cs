@@ -1,19 +1,20 @@
 using Raylib_cs;
 
-namespace BasicGameProject.Backend;
+namespace BasicGameProject.Backend.FrontendDebugger;
 
 public class Frontend
 {
-    public int[][] tileMap;
-    public List<Backend.Object> objects;
-    public List<Backend.Player> players;
-    public static void DrawObject(Backend.Object obj)
+    /*
+    public void Start()
     {
-        Raylib.DrawRectangle(obj.Position.X, obj.Position.Y, obj.CollisionSize.Width, obj.CollisionSize.Height, Color.BLUE);
+        Raylib.InitWindow(800, 450, "BasicGameProject");
+        while (!Raylib.WindowShouldClose())
+        {
+            Raylib.BeginDrawing();
+            Raylib.ClearBackground(Raylib.Color.RAYWHITE);
+            Raylib.EndDrawing();
+        }
+        Raylib.CloseWindow();
     }
-
-    public static void DrawPlayer(Backend.Player player)
-    {
-        Raylib.DrawRectangle(player.Position.X, player.Position.Y, player.CollisionSize.Width, player.CollisionSize.Height, Color.GREEN);
-    }
+    */
 }

@@ -34,6 +34,18 @@ public struct Position
     }
 }
 
+public struct PositionInt
+{
+    public int X;
+    public int Y;
+
+    public PositionInt(int x, int y)
+    {
+        X = x;
+        Y = y;
+    }
+}
+
 public struct Movement
 {
     public float DeltaX;
@@ -61,19 +73,31 @@ public interface IDamagable
 {
     int Health { get; set; }
     int MaxHealth { get; set; }
-    ArmorValues armor { get; set; }
+    ArmorValues Armor { get; set; }
 }
 
-public interface IHumanoid : IDamagable
+public class Humanoid : Backend.Object, IDamagable
 {
-    float MaxSpeed { get; set; }
+    public float MaxSpeed { get; set; }
+    public int Health { get; set; }
+    public int MaxHealth { get; set; }
+    public ArmorValues Armor { get; set; }
 
-    public void Push(Movement movement, List<Object> objects, bool includeCollision = true)
+    public void Push(Movement movement, List<Backend.Object> objects, bool includeCollision = true)
     {
-        if (includeCollision && IsCollision(objects, new Position(Position.X + movement.DeltaX, Position.Y + movement.DeltaY)))
+        var newPosition = new Position(Position.X + movement.DeltaX, Position.Y + movement.DeltaY);
+        if (includeCollision && IsCollision(objects, newPosition))
             return;
-        Position.X += movement.DeltaX;
-        Position.Y += movement.DeltaY;
+
+        Position = newPosition;
+    }
+
+    public Humanoid(ObjectType type, Position position, Size size, float maxSpeed, int health, ArmorValues armor) : base(type, position, size)
+    {
+        MaxSpeed = maxSpeed;
+        Health = health;
+        MaxHealth = health;
+        Armor = armor;
     }
 }
 

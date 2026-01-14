@@ -1,7 +1,3 @@
-using System.Collections.Generic;
-using System.Dynamic;
-using System.Security.Cryptography;
-
 namespace BasicGameProject.Backend;
 
 public class World
@@ -9,52 +5,65 @@ public class World
     public List<Player> Players = new List<Player>();
     public List<Backend.Object> Objects = new List<Backend.Object>();
     public Size Size { get; set; }
+    public int[,]? TileMap { get; set; }
     public void PrintWorldTiles()
     {
-        for(int y = 0; y < Size.Height; y++)
+        if (TileMap is null)
+            return;
+
+        for (int y = 0; y < TileMap.GetLength(0); y++)
         {
-            foreach(int x in Size.Width)
+            for (int x = 0; x < TileMap.GetLength(1); x++)
             {
-                char tileChar = worldMap[y][x] switch
+                char tileChar = TileMap[y, x] switch
                 {
                     -1 => '0',
                     0 => '.',
                     1 => 'X',
                     _ => ' ',
                 };
-                Console.Write(
-                );
+
+                Console.Write(tileChar);
             }
+
+            Console.WriteLine();
         }
     }
 }
 
-public static class WorldGenerator
+
+public class WorldGenerator
 {
     public Size SizeCompact { get; set; }
     public int TileSize { get; set; }
-    public Size RealSize => new Size(SizeCompact.X * TileSize, SizeCompact.Y * TileSize);
+    public Size RealSize => new Size(SizeCompact.Width * TileSize, SizeCompact.Height * TileSize);
     public List<Backend.Object> Objects { get; set; }
     public List<Backend.Player> Players { get; set; }
+    public WorldGenerator()
+    {
+        Objects = new List<Backend.Object>();
+        Players = new List<Backend.Player>();
+    }
     public void SetValues(Size sizeCompact, int tileSize)
     {
         SizeCompact = sizeCompact;
         TileSize = tileSize;
     }
-    private int[][] SectionedNoiceMap()
+    private int[,] SectionedNoiceMap()
     {
-        int[SizeCompact.Height][SizeCompact.Width] generateMap = {};
+        int[,] generateMap = new int[SizeCompact.Height, SizeCompact.Width];
 
         // Make raw noicemap
         for(int y = 0; y < SizeCompact.Height; y++)
         {
             for(int x = 0; x < SizeCompact.Width; x++)
             {
-                returnMap[y][x] = (Random.NextDouble() < .5) ? -1 : 1;
+                generateMap[y, x] = (new Random().NextDouble() < .5) ? -1 : 1;
             }
         }
+        return generateMap;
     }
-    private float GetAvgRadius(int radius, Position position, int[][] map)
+    private float GetAvgRadius(int radius, PositionInt position, int[,] map)
     {
         int total = 0;
         int count = 0;
@@ -64,58 +73,79 @@ public static class WorldGenerator
             {
                 int checkX = position.X + x;
                 int checkY = position.Y + y;
-                if(checkX >= 0 && checkX < map[0].Length && checkY >= 0 && checkY < map.Length)
+                if(checkX >= 0 && checkX < map.GetLength(1) && checkY >= 0 && checkY < map.GetLength(0))
                 {
-                    total += map[checkY][checkX];
+                    total += map[checkY, checkX];
                     count++;
                 }
             }
         }
-        return (count == 0) ? 0f : (float)total / count;
+        return (count == 0) ? 0f : (float)(total / count);
     }
 
-    /// SmoothMap a int map -> float map
-    private float[][] SmoothMap(int[][] map, int smoothRadius)
+    private float GetAvgRadius(int radius, PositionInt position, float[,] map)
     {
-        float[][] returnMap = new float[map.Length][map[0].Length];
-        for(int y = 0; y < map.Length; y++)
+        float total = 0;
+        int count = 0;
+        for(int y = -radius; y <= radius; y++)
         {
-            for(int x = 0; x < map[0].Length; x++)
+            for(int x = -radius; x <= radius; x++)
             {
-                returnMap[y][x] = GetAvgRadius(smoothRadius, new Position(x, y), map);
+                int checkX = position.X + x;
+                int checkY = position.Y + y;
+                if(checkX >= 0 && checkX < map.GetLength(1) && checkY >= 0 && checkY < map.GetLength(0))
+                {
+                    total += map[checkY, checkX];
+                    count++;
+                }
+            }
+        }
+        return (count == 0) ? 0f : (float)(total / count);
+    }
+
+
+    /// SmoothMap a int map -> float map
+    private float[,] SmoothMap(int[,] map, int smoothRadius)
+    {
+        float[,] returnMap = new float[map.GetLength(0), map.GetLength(1)];
+        for(int y = 0; y < map.GetLength(0); y++)
+        {
+            for(int x = 0; x < map.GetLength(1); x++)
+            {
+                returnMap[y, x] = GetAvgRadius(smoothRadius, new PositionInt(x, y), map);
             }
         }
         return returnMap;
     }
 
-    private float[][] SmoothMap(float[][] map, int smoothRadius)
+    private float[,] SmoothMap(float[,] map, int smoothRadius)
     {
-        float[][] returnMap = new float[map.Length][map[0].Length];
-        for(int y = 0; y < map.Length; y++)
+        float[,] returnMap = new float[map.GetLength(0), map.GetLength(1)];
+        for(int y = 0; y < map.GetLength(0); y++)
         {
-            for(int x = 0; x < map[0].Length; x++)
+            for(int x = 0; x < map.GetLength(1); x++)
             {
-                returnMap[y][x] = GetAvgRadius(smoothRadius, new Position(x, y), map);
+                returnMap[y, x] = GetAvgRadius(smoothRadius, new PositionInt(x, y), map);
             }
         }
         return returnMap;
     }
 
     /// SeparateRegions from a float map -> int map {-1, 1}
-    private int[][] SeperateRegions(float[][] map)
+    private int[,] SeperateRegions(float[,] map)
     {
-        int[][] returnMap = new int[map.Length][map[0].Length];
-        for(int y = 0; y < map.Length; y++)
+        int[,] returnMap = new int[map.GetLength(0), map.GetLength(1)];
+        for(int y = 0; y < map.GetLength(0); y++)
         {
-            for(int x = 0; x < map[0].Length; x++)
+            for(int x = 0; x < map.GetLength(1); x++)
             {
-                if(map[y][x] < 0)
+                if(map[y, x] < 0)
                 {
-                    returnMap[y][x] = -1;
+                    returnMap[y, x] = -1;
                 }
                 else
                 {
-                    returnMap[y][x] = 1;
+                    returnMap[y, x] = 1;
                 }
             }
         }
@@ -123,14 +153,14 @@ public static class WorldGenerator
     }
 
     /// RegionPadding from an int map {-1, 1} -> int map {-1, 0, 1}
-    private int[][] RegionPadding(int[][] map, int padding)
+    private int[,] RegionPadding(int[,] map, int padding)
     {
-        int[][] returnMap = new int[map.Length][map[0].Length];
-        for(int y = 0; y < map.Length; y++)
+        int[,] returnMap = new int[map.GetLength(0), map.GetLength(1)];
+        for(int y = 0; y < map.GetLength(0); y++)
         {
-            for(int x = 0; x < map[0].Length; x++)
+            for(int x = 0; x < map.GetLength(1); x++)
             {
-                if(map[y][x] < 0)
+                if(map[y, x] < 0)
                 {
                     bool nearBorder = false;
                     for(int padY = -padding; padY <= padding; padY++)
@@ -139,9 +169,9 @@ public static class WorldGenerator
                         {
                             int checkX = x + padX;
                             int checkY = y + padY;
-                            if(checkX >= 0 && checkX < map[0].Length && checkY >= 0 && checkY < map.Length)
+                            if(checkX >= 0 && checkX < map.GetLength(1) && checkY >= 0 && checkY < map.GetLength(0))
                             {
-                                if(map[checkY][checkX] > 0)
+                                if(map[checkY, checkX] > 0)
                                 {
                                     nearBorder = true;
                                 }
@@ -150,31 +180,31 @@ public static class WorldGenerator
                     }
                     if(nearBorder)
                     {
-                        returnMap[y][x] = 0;
+                        returnMap[y, x] = 0;
                     }
                     else
                     {
-                        returnMap[y][x] = -1;
+                        returnMap[y, x] = -1;
                     }
                 }
                 else
                 {
-                    returnMap[y][x] = 1;
+                    returnMap[y, x] = 1;
                 }
             }
         }
         return returnMap;
     }
 
-    private List<Object> ConvertMapToObjects(int[][] map)
+    private List<Backend.Object> ConvertMapToObjects(int[,] map)
     {
-        List<Object> objects = new List<Object>();
-        for(int y = 0; y < map.Length; y++)
+        List<Backend.Object> objects = new List<Backend.Object>();
+        for(int y = 0; y < map.GetLength(0); y++)
         {
-            for(int x = 0; x < map[0].Length; x++)
+            for(int x = 0; x < map.GetLength(1); x++)
             {
-                if (Random.NextDouble() < .9) continue;
-                Object objectCreate = map[y][x] switch
+                if (new Random().NextDouble() < .9) continue;
+                Backend.Object? objectCreate = map[y, x] switch
                 {
                     -1 => new Rock(new Position(x, y), objects.Count),
                     1 => new Tree(new Position(x, y), objects.Count),
@@ -190,9 +220,9 @@ public static class WorldGenerator
         return objects;
     }
 
-    private int[][] GenerateBiomeTilemap() 
+    private int[,] GenerateBiomeTilemap() 
     {
-        int[][] returnMap = new int[SizeCompact.Height][SizeCompact.Width];
+        int[,] returnMap = new int[SizeCompact.Height, SizeCompact.Width];
         int center = SizeCompact.Height / 2;
         for(int y = 0; y < SizeCompact.Height; y++)
         {
@@ -206,17 +236,17 @@ public static class WorldGenerator
 
     public World GenerateWorld(int smoothRadius = 4, int regionPadding = 2, int repeatSmoothFunctions = 2)
     {
-        int[][] noiseMap = SectionedNoiceMap();
-        float[][] smoothMap = SmoothMap(noiseMap, smoothRadius);
+        int[,] noiseMap = SectionedNoiceMap();
+        float[,] smoothMap = SmoothMap(noiseMap, smoothRadius);
 
         for(int i = 0; i < repeatSmoothFunctions; i++)
         {
             smoothMap = SmoothMap(smoothMap, smoothRadius);
         }
 
-        int[][] regionedMap = SeperateRegions(smoothMap);
-        int[][] paddedMap = RegionPadding(regionedMap, regionPadding);
-        List<Object> objects = ConvertMapToObjects(paddedMap);
+        int[,] regionedMap = SeperateRegions(smoothMap);
+        int[,] paddedMap = RegionPadding(regionedMap, regionPadding);
+        List<Backend.Object> objects = ConvertMapToObjects(paddedMap);
 
         World world = new World()
         {
