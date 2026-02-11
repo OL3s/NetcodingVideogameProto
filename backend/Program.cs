@@ -4,8 +4,8 @@ using BasicGameProject.Backend.FrontendDebugger;
 
 using System.Threading;
 
-World world = new World(new Size(50, 30));
-world.GenerateWorld();
+World world = new World(new Size(128, 64));
+world.GenerateWorld(new WorldGenerationParameters(radius: 1, iterations: 1));
 Frontend frontend = new Frontend(world);
 
 using var cts = new CancellationTokenSource();

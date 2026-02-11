@@ -1,5 +1,7 @@
 namespace BasicGameProject.Backend;
 
+using Raylib_cs;
+
 public enum ObjectType
 {
     Resource,
@@ -92,7 +94,7 @@ public class Humanoid : Backend.Object, IDamagable
         Position = newPosition;
     }
 
-    public Humanoid(ObjectType type, Position position, Size size, float maxSpeed, int health, ArmorValues armor) : base(type, position, size)
+    public Humanoid(ObjectType type, Position position, Size size, Color color, float maxSpeed, int health, ArmorValues armor) : base(type, position, size, color)
     {
         MaxSpeed = maxSpeed;
         Health = health;

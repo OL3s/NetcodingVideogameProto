@@ -1,17 +1,21 @@
 namespace BasicGameProject.Backend;
 
+using Raylib_cs;
+
 public abstract class Object
 {
     public int Id;
     public ObjectType Type;
     public Position Position;
     public Size CollisionSize;
+    public Color Color;
 
-    public Object(ObjectType type, Position position, Size collisionSize, int id = -1)
+    public Object(ObjectType type, Position position, Size collisionSize, Color color, int id = -1)
     {
         Type = type;
         Position = position;
         CollisionSize = collisionSize;
+        Color = color;
         Id = id;
     }
     public void Teleport(Position position)
@@ -75,14 +79,14 @@ public abstract class Object
 
 public class Tree : Object
 {
-    public Tree(Position position, int id) : base(ObjectType.Resource, position, new Size(16, 16), id)
+    public Tree(Position position, int id) : base(ObjectType.Resource, position, new Size(16, 16), new Color(34, 139, 34, 255), id)
     {
     }
 }
 
 public class Rock : Object
 {
-    public Rock(Position position, int id) : base(ObjectType.Resource, position, new Size(16, 16), id)
+    public Rock(Position position, int id) : base(ObjectType.Resource, position, new Size(16, 16), new Color(100, 100, 100, 255), id)
     {
     }
 }

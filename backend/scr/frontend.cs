@@ -1,5 +1,4 @@
 using Raylib_cs;
-using System.Threading;
 
 namespace BasicGameProject.Backend.FrontendDebugger;
 
@@ -42,9 +41,10 @@ public class Frontend
 
                         Color color = tile switch
                         {
-                            0 => Color.DarkGreen,
-                            1 => Color.Green,
-                            _ => Color.Brown
+                            0 => Color.DarkGray,
+                            1 => Color.Gray,
+                            2 => Color.LightGray,
+                            _ => Color.Magenta
                         };
 
                         Raylib.DrawRectangle(
@@ -63,8 +63,28 @@ public class Frontend
             }
 
             // objects
+            foreach (var obj in world.Objects)
+            {
+                Raylib.DrawEllipse(
+                    (int)obj.Position.X - cameraPosition[0],
+                    (int)obj.Position.Y - cameraPosition[1],
+                    obj.CollisionSize.Width / 2f,
+                    obj.CollisionSize.Height / 2f,
+                    obj.Color
+                );
+            }
 
             // players
+            foreach (var player in world.Players)
+            {
+                Raylib.DrawEllipse(
+                    (int)player.Position.X - cameraPosition[0],
+                    (int)player.Position.Y - cameraPosition[1],
+                    player.CollisionSize.Width / 2f,
+                    player.CollisionSize.Height / 2f,
+                    player.Color
+                );
+            }
 
             // overlay U
             Raylib.DrawFPS(10, 10);
